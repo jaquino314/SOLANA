@@ -11,14 +11,14 @@ const {
     sendAndConfirmTransaction
 } = require("@solana/web3.js");
 
-const DEMO_FROM_SECRET_KEY = new Uint8Array(
+const fromGenerateKey = new Uint8Array(
     [
-        160,  20, 189, 212, 129, 188, 171, 124,  20, 179,  80,
-         27, 166,  17, 179, 198, 234,  36, 113,  87,   0,  46,
-        186, 250, 152, 137, 244,  15,  86, 127,  77,  97, 170,
-         44,  57, 126, 115, 253,  11,  60,  90,  36, 135, 177,
-        185, 231,  46, 155,  62, 164, 128, 225, 101,  79,  69,
-        101, 154,  24,  58, 214, 219, 238, 149,  86
+        150, 242,  37,  32, 117, 237, 148,  38, 198, 186, 208,
+        250, 217,  39, 126, 235, 131,  86,  65, 108,   4, 163,
+        150, 100, 224,   5, 182, 112, 168, 145,  53,  16,  11,
+        53, 250,  59,  56,  85, 216, 205, 241, 231, 186, 110,
+        216,  73,  27, 115,  46, 218, 130, 223,   1, 182, 106,
+        41,   5, 134, 111, 121, 154, 203,  84, 167
       ]            
 );
 
@@ -26,7 +26,7 @@ const transferSol = async() => {
     const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
 
     // Get Keypair from Secret Key
-    var from = Keypair.fromSecretKey(DEMO_FROM_SECRET_KEY);
+    var from = Keypair.fromSecretKey(fromGenerateKey);
 
     // Other things to try: 
     // 1) Form array from userSecretKey
