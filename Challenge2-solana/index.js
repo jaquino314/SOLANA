@@ -22,26 +22,26 @@ const fromGenerateKey = new Uint8Array(
       ]            
 );
 
-// Get the wallet balance from a given keyPair
+/* // Get the wallet balance from a given keyPair
 const getWalletBalance = async (keyPair, sender = true) => {
     try {
         // Connect to the Devnet
         const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
-        
+
         // Get wallet balance
         // const selectedWallet = await Keypair.fromSecretKey(keyPair.secretKey);
         const walletBalance = await connection.getBalance(
             new PublicKey(keyPair.publicKey)
         );
-        if (sender === true){
+        if (sender === true) {
             console.log(`FROM wallet balance: ${parseInt(walletBalance) / LAMPORTS_PER_SOL} SOL`);
-        } else{
+        } else {
             console.log(`TO wallet balance: ${parseInt(walletBalance) / LAMPORTS_PER_SOL} SOL`); // 0.000000001 SOL
         }
     } catch (err) {
         console.log(err);
     }
-};
+}; */
 
 const transferSol = async() => {
     const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
@@ -52,9 +52,9 @@ const transferSol = async() => {
     // Generate another Keypair (account we'll be sending to)
     const to = Keypair.generate();
 
-    // Print wallet balances before airdrop
+/*     // Print wallet balances before airdrop
     await getWalletBalance(from, sender = true);
-    await getWalletBalance(to, sender = false);
+    await getWalletBalance(to, sender = false); */
 
     // Aidrop 2 SOL to Sender wallet
     console.log("Airdopping some SOL to Sender wallet!");
@@ -76,17 +76,24 @@ const transferSol = async() => {
 
     console.log("Airdrop completed for the Sender account");
 
-    // Print wallet balances after airdrop
-    await getWalletBalance(from);
-    await getWalletBalance(to, sender = false);
+    // Show wallet balances before transfer
+    let fromBalance = await connection.getBalance(new PublicKey(from.publicKey));
+    console.log("From Balance:", parseInt(fromBalance)/LAMPORTS_PER_SOL);
+
+    let toBalance = await connection.getBalance(new PublicKey(to.publicKey))
+    console.log("To Balance:", parseInt(toBalance)/LAMPORTS_PER_SOL);
+    
+    // Show amoount to be transferred
+    let sendBal = (fromBalance)/2;
+    console.log("Amt to be Tranferred:", parseInt(sendBal)/LAMPORTS_PER_SOL);
+
 
     // Send money from "from" wallet and into "to" wallet
     var transaction = new Transaction().add(
         SystemProgram.transfer({
             fromPubkey: from.publicKey,
             toPubkey: to.publicKey,
-            // Transfer 0.01 SOL
-            lamports: LAMPORTS_PER_SOL / 100
+            lamports: sendBal
         })
     );
 
@@ -98,9 +105,18 @@ const transferSol = async() => {
     );
     console.log('Signature is ', signature);
 
-    // Print wallet balances after transfer
+    // Updated balances after transfer
+    fromBalance = await connection.getBalance(new PublicKey(from.publicKey));
+    toBalance = await connection.getBalance(new PublicKey(to.publicKey))
+
+    console.log("New From Balance:", parseInt(fromBalance)/LAMPORTS_PER_SOL);
+    console.log("New To Balance:", parseInt(toBalance)/LAMPORTS_PER_SOL);
+
+/*     // Print wallet balances after transfer
     await getWalletBalance(from);
     await getWalletBalance(to, sender = false);
+*/
+
 }
 
 transferSol();
