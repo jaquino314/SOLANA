@@ -22,20 +22,39 @@ const fromGenerateKey = new Uint8Array(
       ]            
 );
 
+// Get the wallet balance from a given keyPair
+const getWalletBalance = async (keyPair, sender = true) => {
+    try {
+        // Connect to the Devnet
+        const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
+        
+        // Get wallet balance
+        // const selectedWallet = await Keypair.fromSecretKey(keyPair.secretKey);
+        const walletBalance = await connection.getBalance(
+            new PublicKey(keyPair.publicKey)
+        );
+        if (sender === true){
+            console.log(`FROM wallet balance: ${parseInt(walletBalance) / LAMPORTS_PER_SOL} SOL`);
+        } else{
+            console.log(`TO wallet balance: ${parseInt(walletBalance) / LAMPORTS_PER_SOL} SOL`); // 0.000000001 SOL
+        }
+    } catch (err) {
+        console.log(err);
+    }
+};
+
 const transferSol = async() => {
     const connection = new Connection(clusterApiUrl("devnet"), "confirmed");
 
     // Get Keypair from Secret Key
     var from = Keypair.fromSecretKey(fromGenerateKey);
 
-    // Other things to try: 
-    // 1) Form array from userSecretKey
-    // const from = Keypair.fromSecretKey(Uint8Array.from(userSecretKey));
-    // 2) Make a new Keypair (starts with 0 SOL)
-    // const from = Keypair.generate();
-
     // Generate another Keypair (account we'll be sending to)
     const to = Keypair.generate();
+
+    // Print wallet balances before airdrop
+    await getWalletBalance(from, sender = true);
+    await getWalletBalance(to, sender = false);
 
     // Aidrop 2 SOL to Sender wallet
     console.log("Airdopping some SOL to Sender wallet!");
@@ -57,11 +76,16 @@ const transferSol = async() => {
 
     console.log("Airdrop completed for the Sender account");
 
+    // Print wallet balances after airdrop
+    await getWalletBalance(from);
+    await getWalletBalance(to, sender = false);
+
     // Send money from "from" wallet and into "to" wallet
     var transaction = new Transaction().add(
         SystemProgram.transfer({
             fromPubkey: from.publicKey,
             toPubkey: to.publicKey,
+            // Transfer 0.01 SOL
             lamports: LAMPORTS_PER_SOL / 100
         })
     );
@@ -73,6 +97,10 @@ const transferSol = async() => {
         [from]
     );
     console.log('Signature is ', signature);
+
+    // Print wallet balances after transfer
+    await getWalletBalance(from);
+    await getWalletBalance(to, sender = false);
 }
 
 transferSol();
