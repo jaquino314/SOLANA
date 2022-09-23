@@ -1,6 +1,5 @@
 // importfunctionalities
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import {
   PublicKey,
@@ -92,34 +91,83 @@ function App() {
     }
   };
 
+  const disconnectWallet = async () => {
+    // @ts-ignore
+    const { solana } = window;
+
+    if (walletKey && solana) {
+      try{
+        // disconnects wallet and returns response
+        await (solana as PhantomProvider).disconnect();
+        // make sure wallet key is already undefined
+        setWalletKey(undefined);
+      } catch (err) {
+        // { code: 4001, message: 'User rejected the request.' }
+      }
+    }
+  };
+
 	// HTML code for the app
   return (
     <div className="App">
       <header className="App-header">
-        <h2>Connect to Phantom Wallet</h2>
-      </header>
+        <h1>Connect to Phantom Wallet</h1>
+       </header>
       {provider && !walletKey && (
+        <button
+          style={{
+            fontSize: "24px",
+            padding: "16px 42px",
+            fontWeight: "bold",
+            borderRadius: "5px",
+            position: "absolute",
+            top: "2%",
+            left: "85%"
+
+          }}
+          onClick={connectWallet}
+        >
+          Connect Wallet
+        </button>
+      )}
+      {provider && walletKey && (
+        <div>
+          <p style={{
+            fontWeight: "bold", 
+            color: "white", 
+            position: "absolute", 
+            top: "90%", 
+            left: "35%",  
+          }}>
+            Connected account <br/>
+            Wallet Address : 
+            {walletKey as unknown as string}
+          </p>
           <button
             style={{
-              fontSize: "16px",
-              padding: "15px",
+              fontSize: "24px",
+              padding: "16px 42px",
               fontWeight: "bold",
               borderRadius: "5px",
+              position: "absolute",
+              top: "20px",
+              right: "20px",
             }}
-            onClick={connectWallet}
+            onClick={disconnectWallet}
           >
-            Connect Wallet
+            Disconnect Wallet
           </button>
-        )}
-        {provider && walletKey && <p>Connected account</p> }
-
-        {!provider && (
+        </div>
+      )}
+      {
+        !provider && (
           <p>
-            No provider found. Install{" "}
+            No provider found.Install {" "}
             <a href="https://phantom.app/">Phantom Browser extension</a>
           </p>
-        )}
-    </div>
+        )
+      }
+    </div >
   );
 }
 
